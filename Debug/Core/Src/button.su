@@ -1,0 +1,4 @@
+button.c:35:15:buttonPin	16	static
+button.c:45:6:button_reading	16	static
+button.c:80:15:is_button_pressed	16	static
+button.c:89:15:is_button_pressed_hold	16	static

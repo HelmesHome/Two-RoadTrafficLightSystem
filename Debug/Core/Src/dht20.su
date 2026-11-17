@@ -1,0 +1,2 @@
+dht20.c:22:6:Task_DHT20_Trigger	24	static
+dht20.c:33:6:Task_DHT20_Fetch_And_Print	56	static

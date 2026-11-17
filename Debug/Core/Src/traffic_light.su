@@ -1,0 +1,8 @@
+traffic_light.c:10:6:TL1_Set_Off	8	static
+traffic_light.c:14:6:TL1_Set_Yellow	8	static
+traffic_light.c:18:6:TL1_Set_Green	8	static
+traffic_light.c:22:6:TL1_Set_Red	8	static
+traffic_light.c:27:6:TL2_Set_Off	8	static
+traffic_light.c:31:6:TL2_Set_Yellow	8	static
+traffic_light.c:35:6:TL2_Set_Green	8	static
+traffic_light.c:39:6:TL2_Set_Red	8	static
