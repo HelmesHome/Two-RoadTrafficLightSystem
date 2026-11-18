@@ -19,8 +19,32 @@ int get_auto_state(void) {
     return (int)auto_state;
 }
 
-void fsm_automatic_init(void) {
-    if (system_mode == 1) auto_state = AUTO_INIT;
+void fsm_automatic_init(int current_man_state) {
+	if (system_mode == 1) {
+		if (current_man_state >= 1 && current_man_state <= 4) {
+			auto_state = (Auto_State)(current_man_state);
+
+			if (auto_state == AUTO_RED_GREEN) {
+				count_TL1 = red_duration;
+				count_TL2 = green_duration;
+			}
+			else if (auto_state == AUTO_RED_AMBER) {
+				count_TL1 = amber_duration;
+				count_TL2 = amber_duration;
+			}
+			else if (auto_state == AUTO_GREEN_RED) {
+				count_TL1 = green_duration;
+				count_TL2 = red_duration;
+			}
+			else if (auto_state == AUTO_AMBER_RED) {
+		    	count_TL1 = amber_duration;
+		    	count_TL2 = amber_duration;
+			 }
+		} else {
+			auto_state = AUTO_INIT;
+		}
+		auto_tick = 0;
+	}
 }
 
 void fsm_automatic_run(void) {
@@ -45,7 +69,7 @@ void fsm_automatic_run(void) {
 			break;
 		case AUTO_RED_AMBER:
 			TL1_Set_Red();
-			TL2_Set_Yellow(); // Tương ứng Amber
+			TL2_Set_Yellow();
 			if (count_TL1 <= 0 && auto_tick == 0) {
 				count_TL1 = green_duration;
 				count_TL2 = red_duration;
@@ -72,5 +96,7 @@ void fsm_automatic_run(void) {
 		 	}
 		 	break;
 	}
-    LCD_Update_Traffic_Info(system_mode, count_TL1, count_TL2);
+	if (auto_tick == 0) {
+		LCD_Update_Traffic_Info(system_mode, count_TL1, count_TL2);
+	}
 }

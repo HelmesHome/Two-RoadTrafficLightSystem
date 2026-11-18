@@ -27,11 +27,11 @@ void fsm_tuning_run(void) {
 	        blink_timer = 0;
 	        led_toggle = 1 - led_toggle;
 
-	        if (system_mode == 3) { // Tune Red
+	        if (system_mode == 3) {
 	            if (led_toggle) { TL1_Set_Red(); TL2_Set_Red(); } else { TL1_Set_Off(); TL2_Set_Off(); }
-	        } else if (system_mode == 4) { // Tune Amber
+	        } else if (system_mode == 4) {
 	            if (led_toggle) { TL1_Set_Yellow(); TL2_Set_Yellow(); } else { TL1_Set_Off(); TL2_Set_Off(); }
-	        } else if (system_mode == 5) { // Tune Green
+	        } else if (system_mode == 5) {
 	            if (led_toggle) { TL1_Set_Green(); TL2_Set_Green(); } else { TL1_Set_Off(); TL2_Set_Off(); }
 	        }
 	    }
@@ -46,7 +46,6 @@ void fsm_tuning_run(void) {
 
 	    if (is_button_pressed(1) == 1 ||is_button_pressed_hold(1) == 1) {
 	    	if (system_mode == 3) {
-	    	            // --- ĐANG CHỈNH ĐÈN ĐỎ ---
 	    		if (tune_duration > amber_duration && tune_duration <= 99) {
 	    			red_duration = tune_duration;
 	    			green_duration = red_duration - amber_duration;
@@ -54,7 +53,6 @@ void fsm_tuning_run(void) {
 	    			tune_duration = red_duration;
 	    		}
 	    	} else if (system_mode == 4) {
-	    	            // --- ĐANG CHỈNH ĐÈN VÀNG ---
 	    		if (tune_duration > 0 && (tune_duration + green_duration) <= 99) {
 	    			amber_duration = tune_duration;
 	    			red_duration = green_duration + amber_duration;
@@ -62,7 +60,6 @@ void fsm_tuning_run(void) {
 	    			tune_duration = amber_duration;
 	    		}
 	    	} else if (system_mode == 5) {
-	    	            // --- ĐANG CHỈNH ĐÈN XANH ---
 	    		if (tune_duration > 0 && (tune_duration + amber_duration) <= 99) {
 	    			green_duration = tune_duration;
 	    			red_duration = green_duration + amber_duration;
@@ -71,5 +68,7 @@ void fsm_tuning_run(void) {
 	    		}
 	    	}
 	    }
-    LCD_Update_Traffic_Info(system_mode, tune_duration, 0);
+	    if (blink_timer == 0) {
+	        LCD_Update_Traffic_Info(system_mode, tune_duration, 0);
+	    }
 }

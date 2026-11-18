@@ -22,7 +22,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "lcd.h"
+#include "scheduler.h"
+#include "fsm_automatic.h"
+#include "global.h"
+#include "dht20.h"
+#include "button.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,7 +52,7 @@ TIM_HandleTypeDef htim2;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-uint8_t found[8]; int n = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -62,7 +67,10 @@ static void MX_I2C1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+void app_task_10ms(void) {
+    button_reading();
+    fsm_global_run();
+}
 /* USER CODE END 0 */
 
 /**
@@ -97,31 +105,35 @@ int main(void)
   MX_TIM2_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
+  lcd_init();
+  lcd_clear();
+  lcd_put_cur(0, 0);
+  lcd_send_string("LCD TEST OK!");
+  fsm_automatic_init(0);
+  SCH_Init();
 
+  SCH_Add_Task(app_task_10ms, 0, 1);
+  SCH_Add_Task(Task_DHT20_Trigger, 5, 400);
+  HAL_TIM_Base_Start_IT(&htim2);
+
+
+//  lcd_put_cur(0, 0);
+//  lcd_send_string("LCD TEST OK!");
+// 	tìm address của I2C
+//  uint8_t found[8]; int n = 0;
+//  for (uint8_t addr = 1; addr < 128; addr++) {
+//  if (HAL_I2C_IsDeviceReady(&hi2c1, addr << 1, 1, 10) == HAL_OK)
+//  if (n < 8) found[n++] = addr; // set a breakpoint to inspect the found array
+//  }
+  // ĐẶT BREAKPOINT TẠI DÒNG NÀY:
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-//	  if (HAL_GPIO_ReadPin(BTN_3_GPIO_Port, BTN_3_Pin) == GPIO_PIN_RESET) {
-//	      // Nếu đọc được mức 0, bật sáng đèn Đỏ (A=1, B=1)
-//	      HAL_GPIO_WritePin(TL1_A_GPIO_Port, TL1_A_Pin, 1);
-//	      HAL_GPIO_WritePin(TL1_B_GPIO_Port, TL1_B_Pin, 1);
-//	  } else if (HAL_GPIO_ReadPin(BTN_4_GPIO_Port, BTN_4_Pin) == GPIO_PIN_RESET) {
-//  	      // Nếu đọc được mức 0, bật sáng đèn Đỏ (A=1, B=1)
-//  	      HAL_GPIO_WritePin(TL1_A_GPIO_Port, TL1_A_Pin, 0);
-//  	      HAL_GPIO_WritePin(TL1_B_GPIO_Port, TL1_B_Pin, 1);
-//  	  } else {
-//	  	      // Nếu đọc được mức 1, tắt đèn (A=0, B=0)
-//	  	      HAL_GPIO_WritePin(TL1_A_GPIO_Port, TL1_A_Pin, 0);
-//	  	      HAL_GPIO_WritePin(TL1_B_GPIO_Port, TL1_B_Pin, 0);
-//	  	  }
+	  SCH_Dispatch_Tasks();
 
-	  for (uint8_t addr = 1; addr < 128; addr++) {
-		  if (HAL_I2C_IsDeviceReady(&hi2c1, addr << 1, 1, 10) == HAL_OK)
-			  if (n < 8) found[n++] = addr; // set a breakpoint to inspect the found array
-	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -221,7 +233,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 7999;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 9;
+  htim2.Init.Period = 79;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -294,7 +306,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, LD2_Pin|BTN_2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, TL2_B_Pin|TL1_A_Pin|TL2_A_Pin|TL1_B_Pin, GPIO_PIN_RESET);
@@ -305,12 +317,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LD2_Pin BTN_2_Pin */
-  GPIO_InitStruct.Pin = LD2_Pin|BTN_2_Pin;
+  /*Configure GPIO pin : LD2_Pin */
+  GPIO_InitStruct.Pin = LD2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : TL2_B_Pin TL1_A_Pin TL2_A_Pin TL1_B_Pin */
   GPIO_InitStruct.Pin = TL2_B_Pin|TL1_A_Pin|TL2_A_Pin|TL1_B_Pin;
@@ -322,19 +334,19 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : BTN_3_Pin */
   GPIO_InitStruct.Pin = BTN_3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(BTN_3_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : BTN_1_Pin */
-  GPIO_InitStruct.Pin = BTN_1_Pin;
+  /*Configure GPIO pins : BTN_1_Pin BTN_2_Pin */
+  GPIO_InitStruct.Pin = BTN_1_Pin|BTN_2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(BTN_1_GPIO_Port, &GPIO_InitStruct);
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : BTN_4_Pin */
   GPIO_InitStruct.Pin = BTN_4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(BTN_4_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
@@ -344,7 +356,11 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+    if (htim->Instance == TIM2) {
+        SCH_Update();
+    }
+}
 /* USER CODE END 4 */
 
 /**

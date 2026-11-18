@@ -2,4 +2,4 @@ scheduler.c:11:6:SCH_Init	4	static
 scheduler.c:14:10:SCH_Add_Task	48	static
 scheduler.c:36:10:SCH_Delete_Task	32	static
 scheduler.c:51:6:SCH_Dispatch_Tasks	16	static
-scheduler.c:65:6:SCH_Update	4	static
+scheduler.c:62:6:SCH_Update	4	static

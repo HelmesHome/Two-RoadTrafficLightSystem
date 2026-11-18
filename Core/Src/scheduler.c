@@ -49,18 +49,15 @@ uint32_t SCH_Delete_Task(uint32_t taskID) {
 	return SCH_count;
 }
 void SCH_Dispatch_Tasks(void) {
-    while (SCH_count > 0 && SCH_tasks_G[0].RunMe > 0) {
-        void (*pTask)(void) = SCH_tasks_G[0].pTask;
-        uint32_t period = SCH_tasks_G[0].Period;
-        (*pTask)();
-        SCH_Delete_Task(0);
-        if (period > 0) {
-            SCH_Add_Task(pTask, period, period);
-        }
-        if (SCH_count > 0 && SCH_tasks_G[0].Delay == 0) {
-            SCH_tasks_G[0].RunMe = 1;
-        }
-    }
+	if (SCH_tasks_G[0].RunMe > 0) {
+		void (*pFunc)(void) = SCH_tasks_G[0].pTask;
+		uint32_t run_period = SCH_tasks_G[0].Period;
+		SCH_Delete_Task(0);
+		(*pFunc)();
+		if (run_period > 0) {
+			SCH_Add_Task(pFunc, run_period, run_period);
+		}
+	}
 }
 void SCH_Update() {
 	if (SCH_count == 0) return;

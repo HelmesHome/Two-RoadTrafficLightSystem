@@ -26,15 +26,13 @@ void fsm_global_run(void) {
         TL1_Set_Off(); TL2_Set_Off(); lcd_clear();
 
         if (system_mode == 1) {
-        	fsm_automatic_init();
+        	fsm_automatic_init(get_manual_state());
         }
         else if (system_mode == 2) {
-                    // Sang Manual: Bắt chụp trạng thái đèn hiện tại của Auto
         	int current_state = get_auto_state();
         	fsm_manual_init(current_state);
         }
         else {
-                    // Sang Tuning (Mode 3, 4, 5): Nạp biến thời gian để chuẩn bị chỉnh sửa
         	fsm_tuning_init();
         }
     }
