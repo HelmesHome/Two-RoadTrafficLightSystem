@@ -2427,13 +2427,13 @@ void fsm_tuning_run(void) {
  80016e4:	f000 ffe4 	bl	80026b0 <TL2_Set_Off>
 	        }
 	    }
-	    if (is_button_pressed(2) == 1 || is_button_pressed_hold(2) == 1) {
- 80016e8:	2002      	movs	r0, #2
+	    if (is_button_pressed(1) == 1 || is_button_pressed_hold(1) == 1) {
+ 80016e8:	2001      	movs	r0, #1
  80016ea:	f7ff fd03 	bl	80010f4 <is_button_pressed>
  80016ee:	4603      	mov	r3, r0
  80016f0:	2b01      	cmp	r3, #1
  80016f2:	d005      	beq.n	8001700 <fsm_tuning_run+0xac>
- 80016f4:	2002      	movs	r0, #2
+ 80016f4:	2001      	movs	r0, #1
  80016f6:	f7ff fd1b 	bl	8001130 <is_button_pressed_hold>
  80016fa:	4603      	mov	r3, r0
  80016fc:	2b01      	cmp	r3, #1
@@ -2453,13 +2453,13 @@ void fsm_tuning_run(void) {
  8001714:	2201      	movs	r2, #1
  8001716:	601a      	str	r2, [r3, #0]
 	    }
-	    if (is_button_pressed(3) == 1 || is_button_pressed_hold(3) == 1) {
- 8001718:	2003      	movs	r0, #3
+	    if (is_button_pressed(2) == 1 || is_button_pressed_hold(2) == 1) {
+ 8001718:	2002      	movs	r0, #2
  800171a:	f7ff fceb 	bl	80010f4 <is_button_pressed>
  800171e:	4603      	mov	r3, r0
  8001720:	2b01      	cmp	r3, #1
  8001722:	d005      	beq.n	8001730 <fsm_tuning_run+0xdc>
- 8001724:	2003      	movs	r0, #3
+ 8001724:	2002      	movs	r0, #2
  8001726:	f7ff fd03 	bl	8001130 <is_button_pressed_hold>
  800172a:	4603      	mov	r3, r0
  800172c:	2b01      	cmp	r3, #1
@@ -2480,13 +2480,13 @@ void fsm_tuning_run(void) {
  8001746:	601a      	str	r2, [r3, #0]
 	    	    }
 
-	    if (is_button_pressed(1) == 1 ||is_button_pressed_hold(1) == 1) {
- 8001748:	2001      	movs	r0, #1
+	    if (is_button_pressed(3) == 1 ||is_button_pressed_hold(3) == 1) {
+ 8001748:	2003      	movs	r0, #3
  800174a:	f7ff fcd3 	bl	80010f4 <is_button_pressed>
  800174e:	4603      	mov	r3, r0
  8001750:	2b01      	cmp	r3, #1
  8001752:	d005      	beq.n	8001760 <fsm_tuning_run+0x10c>
- 8001754:	2001      	movs	r0, #1
+ 8001754:	2003      	movs	r0, #3
  8001756:	f7ff fceb 	bl	8001130 <is_button_pressed_hold>
  800175a:	4603      	mov	r3, r0
  800175c:	2b01      	cmp	r3, #1
