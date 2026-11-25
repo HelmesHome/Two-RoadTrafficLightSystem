@@ -13,6 +13,10 @@
 #include "fsm_tuning.h"
 #include "traffic_light.h"
 
+extern int temp_red;
+extern int temp_amber;
+extern int temp_green;
+
 uint8_t system_mode = 1;
 int red_duration = 5;
 int amber_duration = 2;
@@ -29,8 +33,7 @@ void fsm_global_run(void) {
         	fsm_automatic_init(get_manual_state());
         }
         else if (system_mode == 2) {
-        	int current_state = get_auto_state();
-        	fsm_manual_init(current_state);
+        	fsm_manual_init(get_auto_state());
         }
         else {
         	fsm_tuning_init();

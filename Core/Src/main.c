@@ -28,6 +28,7 @@
 #include "global.h"
 #include "dht20.h"
 #include "button.h"
+#include "software_timer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -359,6 +360,7 @@ static void MX_GPIO_Init(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     if (htim->Instance == TIM2) {
         SCH_Update();
+        timerRun();
     }
 }
 /* USER CODE END 4 */
