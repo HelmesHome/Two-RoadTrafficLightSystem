@@ -24,10 +24,13 @@
 /* USER CODE BEGIN Includes */
 #include "lcd.h"
 #include "scheduler.h"
+#include "software_timer.h"
 #include "fsm_automatic.h"
+#include "fsm_tuning.h"
 #include "global.h"
 #include "dht20.h"
 #include "button.h"
+#include "uart_log.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,8 +71,16 @@ static void MX_I2C1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 void app_task_10ms(void) {
+    timer_run();
     button_reading();
     fsm_global_run();
+    if (!((system_mode >= 3 && system_mode <= 5) && fsm_tuning_is_error_wait())) {
+        LCD_Update_Environment();
+    }
+}
+
+void Task_Heartbeat_LED(void) {
+    HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 }
 /* USER CODE END 0 */
 
@@ -105,15 +116,20 @@ int main(void)
   MX_TIM2_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
+  timer_init();
+  button_init();
   lcd_init();
   lcd_clear();
-  lcd_put_cur(0, 0);
-  lcd_send_string("LCD TEST OK!");
+  DHT20_Init();
   fsm_automatic_init(0);
+  LCD_Update_Environment();
   SCH_Init();
 
   SCH_Add_Task(app_task_10ms, 0, 1);
+  SCH_Add_Task(Task_Heartbeat_LED, 0, 50);
   SCH_Add_Task(Task_DHT20_Trigger, 5, 400);
+  uart_log("[SYS] Traffic Light Ready (R=%02d G=%02d A=%02d)\r\n",
+           red_duration, green_duration, amber_duration);
   HAL_TIM_Base_Start_IT(&htim2);
 
 
